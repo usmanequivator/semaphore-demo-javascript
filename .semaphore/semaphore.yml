@@ -41,6 +41,7 @@ blocks:
 
           # Use the version of Node.js specified in .nvmrc.
           # Semaphore provides nvm preinstalled.
+          - nvm install
           - nvm use
           - node --version
           - npm --version
