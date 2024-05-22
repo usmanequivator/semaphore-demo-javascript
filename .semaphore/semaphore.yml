@@ -48,7 +48,6 @@ blocks:
       jobs:
         - name: server npm install and cache
           commands:
-            - cd src
             - cache restore server-node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),server-node-modules-$SEMAPHORE_GIT_BRANCH,server-node-modules-master
             - npm install --legacy-peer-deps
             - cache store server-node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json) node_modules
@@ -70,7 +69,6 @@ blocks:
       jobs:
         - name: Server Lint
           commands:
-            - cd src
             - cache restore server-node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),server-node-modules-$SEMAPHORE_GIT_BRANCH,server-node-modules-master
             - npm run lint
 
@@ -92,7 +90,6 @@ blocks:
         - name: Server Unit Tests
           commands:
             - export NAME="Server tests"
-            - cd src
             - cache restore server-node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),server-node-modules-$SEMAPHORE_GIT_BRANCH,server-node-modules-master
             - npm test
       epilogue:
@@ -125,7 +122,6 @@ blocks:
         - name: Server E2E Tests
           commands:
             - export NAME="Server tests"
-            - cd src
             - cache restore server-node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),server-node-modules-$SEMAPHORE_GIT_BRANCH,server-node-modules-master
             - cp ormconfig.ci.json ormconfig.json
             - npm run migrate:up
