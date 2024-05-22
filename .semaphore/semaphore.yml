@@ -16,12 +16,6 @@ agent:
     type: e1-standard-2
     os_image: ubuntu2004
 
-# Define the global setup block.
-setup:
-  commands:
-    - checkout
-    - nvm install # Install the Node.js version specified in .nvmrc
-
 # Blocks are the heart of a pipeline and are executed sequentially.
 # Each block has a task that defines one or more jobs. Jobs define the
 # commands to execute.
@@ -47,6 +41,7 @@ blocks:
 
           # Use the version of Node.js specified in .nvmrc.
           # Semaphore provides nvm preinstalled.
+          - nvm install
           - nvm use
           - node --version
           - npm --version
@@ -68,6 +63,7 @@ blocks:
       prologue:
         commands:
           - checkout
+          - nvm install
           - nvm use
           - node --version
           - npm --version
@@ -88,6 +84,7 @@ blocks:
       prologue:
         commands:
           - checkout
+          - nvm install
           - nvm use
           - node --version
           - npm --version
@@ -113,6 +110,7 @@ blocks:
       prologue:
         commands:
           - checkout
+          - nvm install
           - nvm use
           - node --version
           - npm --version
