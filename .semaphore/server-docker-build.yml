@@ -15,7 +15,6 @@ blocks:
       # For info on creating secrets, see:
       # https://docs.semaphoreci.com/article/66-environment-variables-and-secrets
       secrets:
-        - name: gcr-secret
         - name: server-ormconfig-production
         - name: server-production-env
       prologue:
@@ -55,14 +54,3 @@ blocks:
           # Push a new image to container registry:
           - docker push "gcr.io/$GCP_PROJECT_ID/semaphore-demo-javascript-server:$SEMAPHORE_WORKFLOW_ID"
 
-# The deployment pipeline is defined to run on manual approval from the UI.
-# Semaphore will the time and the name of the person who promotes each
-# deployment.
-#
-# You could, for example, add another promotion to a pipeline that
-# automatically deploys to a staging environment from branches named
-# after a certain pattern.
-# https://docs.semaphoreci.com/article/50-pipeline-yaml#promotions
-promotions:
-  - name: Deploy server to Kubernetes
-    pipeline_file: server-deploy-k8s.yml

@@ -1,7 +1,7 @@
 FROM node:16.16.0-bullseye as dist
 WORKDIR /tmp/
 COPY package*.json tsconfig*.json *.env ormconfig*.json ./
-COPY src/ src/
+COPY src/server/src src/
 RUN npm install
 RUN npm run build
 

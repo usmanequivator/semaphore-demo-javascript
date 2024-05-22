@@ -5,7 +5,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc -p tsconfig.build.json",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "prettier --write \\\"src/**/*.ts\\\" \\\"test/**/*.ts\\\"",
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
     "start:dev": "nodemon",
     "start:debug": "nodemon --config nodemon-debug.json",
@@ -16,7 +16,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand --reporters=default --reporters=jest-junit",
-    "test:e2e": "jest --reporters=default --reporters=jest-junit --config ./test/jest-e2e.json",
+    "test:e2e": "jest --reporters=default --reporters=jest-junit --config test/jest-e2e.json",
     "migrate:up": "ts-node ./node_modules/typeorm/cli.js migration:run",
     "migrate:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert"
   },
