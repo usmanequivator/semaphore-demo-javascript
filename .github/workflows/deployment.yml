@@ -47,9 +47,9 @@ jobs:
         run: |
           docker-compose down --remove-orphans
           docker-compose up -d --force-recreate --renew-anon-volumes
-
-      - name: Cleanup unused Docker images
-        run: docker image prune -f
+#
+#      - name: Cleanup unused Docker images
+#        run: docker image prune -f
 
 #name: CI/CD Pipeline
 #
