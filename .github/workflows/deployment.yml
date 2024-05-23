@@ -36,7 +36,7 @@ jobs:
           echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
 
       - name: Start containers
-        run: docker-compose --env-file .development.env -f "docker-compose.yml" up -d --build
+        run: docker compose --env-file .development.env -f "docker-compose.yml" up -d --build
 
       - name: Install node
         uses: actions/setup-node@v1
@@ -51,7 +51,7 @@ jobs:
 
       - name: Stop containers
         if: always()
-        run: docker-compose -f "docker-compose.yml" down
+        run: docker compose -f "docker-compose.yml" down
 #name: Test Deployment
 #
 #on:
@@ -63,9 +63,9 @@ jobs:
 #    steps:
 #      - uses: actions/checkout@v3
 #      - name: Build docker_compose
-#        run: docker-compose --env-file .development.env up -d --build
+#        run: docker compose --env-file .development.env up -d --build
 #      - name: Build application
-#        run: docker-compose exec -T service yarn build
+#        run: docker compose exec -T service yarn build
 #  deploy:
 #    needs: build
 #    runs-on: self-hosted
@@ -96,4 +96,4 @@ jobs:
 #          git fetch --all &&
 #          git reset --hard origin/develop &&
 #          git pull origin develop &&
-#          docker-compose up -d --build
+#          docker compose up -d --build
