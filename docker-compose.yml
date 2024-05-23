@@ -16,11 +16,10 @@ services:
     restart: "unless-stopped"
     networks:
       - backend
-    links:
-      - db
-    depends_on:
-      - db
+
   db:
+    depends_on:
+      - server
     image: postgres
     restart: always
     env_file:

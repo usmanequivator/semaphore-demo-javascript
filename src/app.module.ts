@@ -6,10 +6,10 @@ import { ConfigService } from './config/config.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useExisting: ConfigService,
-    }),
+    // TypeOrmModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   useExisting: ConfigService,
+    // }),
     ApiModule,
   ],
 })
