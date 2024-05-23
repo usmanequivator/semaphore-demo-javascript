@@ -22,7 +22,13 @@ jobs:
           PRIVATE_KEY: ${{ secrets.SSH_KEY }}
           HOSTNAME : ${{ secrets.SSH_HOST }}
           USERNAME : ${{ secrets.SSH_USER }}
+          DATABASE_DBNAME : ${{ secrets.DATABASE_DBNAME }}
+          DATABASE_HOST : ${{ secrets.DATABASE_HOST }}
+          DATABASE_PASSWORD : ${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_PORT : ${{ secrets.DATABASE_PORT }}
+          DATABASE_USER : ${{ secrets.DATABASE_USER }}
         run: |
+          touch .env
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
 
