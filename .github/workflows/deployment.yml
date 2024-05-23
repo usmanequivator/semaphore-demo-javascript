@@ -34,7 +34,7 @@ jobs:
 #            ${{ runner.os }}-buildx-
 
       - name: Build Docker image
-        run: docker build -t nestjs-app .
+        run: docker build --no-cache -t nestjs-app .
 
       - name: Stop and remove existing containers
         run: |
