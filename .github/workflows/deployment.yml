@@ -1,45 +1,83 @@
-name: Test Deployment
+name: Test
 
 on:
   push:
-    branches: [ develop ]
-jobs:
-  build:
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build docker_compose
-        run: sudo docker-compose --env-file .development.env up -d --build
-      - name: Build application
-        run: sudo docker-compose exec -T service yarn build
-  deploy:
-    needs: build
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v3
-      - name: Deploy application
-        env:
-          PRIVATE_KEY: ${{ secrets.SSH_KEY }}
-          HOSTNAME : ${{ secrets.SSH_HOST }}
-          USERNAME : ${{ secrets.SSH_USER }}
-          DATABASE_DBNAME : ${{ secrets.DATABASE_DBNAME }}
-          DATABASE_HOST : ${{ secrets.DATABASE_HOST }}
-          DATABASE_PASSWORD : ${{ secrets.DATABASE_PASSWORD }}
-          DATABASE_PORT : ${{ secrets.DATABASE_PORT }}
-          DATABASE_USER : ${{ secrets.DATABASE_USER }}
-        run: |
-          touch .development.env
-          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .development.env
-          echo "DATABASE_HOST=${DATABASE_HOST}" >> .development.env
-          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .development.env
-          echo "DATABASE_PORT=${DATABASE_PORT}" >> .development.env
-          echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
+    branches:
+      - main
+      - features/**
+      - dependabot/**
+  pull_request:
+    branches:
+      - main
 
-          cd /UplinesBackend &&
-          git checkout develop &&
-          git fetch --all &&
-          git reset --hard origin/develop &&
-          git pull origin develop &&
-          docker-compose up -d --build
+jobs:
+  docker:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Start containers
+        run: docker-compose --env-file .development.env -f "docker-compose.yml" up -d --build
+
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "docker-compose.yml" down
+#name: Test Deployment
+#
+#on:
+#  push:
+#    branches: [ develop ]
+#jobs:
+#  build:
+#    runs-on: self-hosted
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Build docker_compose
+#        run: docker-compose --env-file .development.env up -d --build
+#      - name: Build application
+#        run: docker-compose exec -T service yarn build
+#  deploy:
+#    needs: build
+#    runs-on: self-hosted
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Deploy application
+#        env:
+#          PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+#          HOSTNAME : ${{ secrets.SSH_HOST }}
+#          USERNAME : ${{ secrets.SSH_USER }}
+#          DATABASE_DBNAME : ${{ secrets.DATABASE_DBNAME }}
+#          DATABASE_HOST : ${{ secrets.DATABASE_HOST }}
+#          DATABASE_PASSWORD : ${{ secrets.DATABASE_PASSWORD }}
+#          DATABASE_PORT : ${{ secrets.DATABASE_PORT }}
+#          DATABASE_USER : ${{ secrets.DATABASE_USER }}
+#        run: |
+#          touch .development.env
+#          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .development.env
+#          echo "DATABASE_HOST=${DATABASE_HOST}" >> .development.env
+#          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .development.env
+#          echo "DATABASE_PORT=${DATABASE_PORT}" >> .development.env
+#          echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
+#          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+#          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
+#
+#          cd /UplinesBackend &&
+#          git checkout develop &&
+#          git fetch --all &&
+#          git reset --hard origin/develop &&
+#          git pull origin develop &&
+#          docker-compose up -d --build
