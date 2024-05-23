@@ -10,9 +10,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
-    volumes:
-      - ./:/app
-      - /app/node_modules
+#    volumes:
+#      - ./:/app
+#      - /app/node_modules
     restart: "unless-stopped"
     networks:
       - backend
