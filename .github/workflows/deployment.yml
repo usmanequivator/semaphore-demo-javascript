@@ -23,11 +23,17 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Build and push Docker image
+      - name: SSH into server and deploy
         run: |
-          docker build -t my-nest-app .
-          docker tag my-nest-app:latest my-nest-app:1.0.${{ github.run_number }}
-          docker push my-nest-app
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh -i ~/.ssh/id_rsa srvadmin@188.117.77.147 'cd /Uplinesbackend && docker-compose up -d'
+
+#      - name: Build and push Docker image
+#        run: |
+#          docker build -t my-nest-app .
+#          docker tag my-nest-app:latest my-nest-app:1.0.${{ github.run_number }}
+#          docker push my-nest-app
 #name: Deploy to Server
 #
 #on:
