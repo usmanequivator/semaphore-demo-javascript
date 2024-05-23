@@ -4,6 +4,15 @@ on:
   push:
     branches:
       - develop
+env:
+  PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+  HOSTNAME: ${{ secrets.SSH_HOST }}
+  USERNAME: ${{ secrets.SSH_USER }}
+  DATABASE_DBNAME: ${{ secrets.DATABASE_DBNAME }}
+  DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+  DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+  DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+  DATABASE_USER: ${{ secrets.DATABASE_USER }}
 
 jobs:
   deploy:
@@ -36,8 +45,8 @@ jobs:
 
       - name: Deploy Docker container
         run: |
-          docker-compose down
-          docker-compose up -d
+          docker compose down
+          docker compose up -d
 
       - name: Cleanup unused Docker images
         run: docker image prune -f
@@ -131,7 +140,7 @@ jobs:
 #  DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
 #  DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
 #  DATABASE_USER: ${{ secrets.DATABASE_USER }}
-#
+
 #jobs:
 #  build:
 #    timeout-minutes: 10
