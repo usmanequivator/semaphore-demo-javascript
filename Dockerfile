@@ -19,7 +19,7 @@ RUN npm run build
 FROM node:16.16.0-bullseye as node_modules
 WORKDIR /tmp/
 COPY package.json package-lock.json ./
-RUN npm install --production
+RUN npm install --production --legacy-peer-deps
 
 FROM node:16.16.0-bullseye
 WORKDIR /usr/local/nub-api
