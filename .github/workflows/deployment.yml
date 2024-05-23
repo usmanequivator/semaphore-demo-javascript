@@ -46,7 +46,7 @@ jobs:
       - name: Deploy Docker container
         run: |
           docker-compose down --remove-orphans
-          docker-compose up -d --force-recreate --renew-anon-volumes
+          docker-compose up --build -d --force-recreate --renew-anon-volumes
 #
 #      - name: Cleanup unused Docker images
 #        run: docker image prune -f
