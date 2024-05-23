@@ -1,48 +1,55 @@
-name: Deploy NestJS App
+name: Deploy to Server
 
 on:
   push:
-    branches: [ develop ]  # Change to your desired branch(es)
+    branches:
+      - develop  # Change to your deployment branch
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
-      - name: Use SSH Agent
-        uses: delasoft/ssh-action@v2.2.1  # Corrected syntax, no need for raw tags
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Build Docker image
+        run: docker build -t nestjs-docker .
+
+      - name: Save Docker image to tar
+        run: docker save nestjs-docker -o image.tar
+
+      - name: Copy Docker image to server
+        uses: appleboy/scp-action@v0.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+          source: "image.tar"
+          target: "/home/your-username/image.tar"
 
-      - name: Login to Server
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+      - name: SSH and Load Docker image on server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            script: |
+            cd /UplinesBackend
+            git checkout develop
+            git pull origin develop
+            docker load -i /home/your-username/image.tar
+            docker stop your-container-name || true
+            docker rm your-container-name || true
+            docker build -t nestjs-docker .
+            docker run -d --name your-container-name -p 3000:3000 nestjs-docker
 
-      - name: Install Docker (if not already installed)
-        run: |
-          if ! which docker > /dev/null; then
-            curl -fsSL https://get.docker.com -o get-docker.sh
-            sudo sh get-docker.sh
-          fi
-        shell: bash
-
-      - name: Build Docker Image (on server)
-        run: |
-          cd /UplinesBackend &&
-          docker build -t my-nestjs-app
-
-      - name: Run the Application (on server)
-        run: |
-          cd /UplinesBackend &&
-          docker run -d -p 80:3000 my-nestjs-app
-
-      - name: (Optional) Stop and Remove Previous Container (if desired)
-        run: |
-          cd /UplinesBackend &&
-          docker stop my-nestjs-app
-          docker rm my-nestjs-app
 #name: Test
 #
 #on:
