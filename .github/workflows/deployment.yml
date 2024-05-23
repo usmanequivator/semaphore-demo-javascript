@@ -152,12 +152,12 @@ jobs:
 #
 ##      - name: Deploy application
 ##        run: |
-##          touch .development.env
-##          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .development.env
-##          echo "DATABASE_HOST=${DATABASE_HOST}" >> .development.env
-##          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .development.env
-##          echo "DATABASE_PORT=${DATABASE_PORT}" >> .development.env
-##          echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
+##          touch .env.development
+##          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .env.development
+##          echo "DATABASE_HOST=${DATABASE_HOST}" >> .env.development
+##          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .env.development
+##          echo "DATABASE_PORT=${DATABASE_PORT}" >> .env.development
+##          echo "DATABASE_USER=${DATABASE_USER}" >> .env.development
 ##
 ##      - name: Start containers
 ##        run: docker compose up
@@ -201,7 +201,7 @@ jobs:
 ##    steps:
 ##      - uses: actions/checkout@v3
 ##      - name: Build docker_compose
-##        run: docker compose --env-file .development.env up -d --build
+##        run: docker compose --env-file .env.development up -d --build
 ##      - name: Build application
 ##        run: docker compose exec -T service yarn build
 ##  deploy:
@@ -220,12 +220,12 @@ jobs:
 ##          DATABASE_PORT : ${{ secrets.DATABASE_PORT }}
 ##          DATABASE_USER : ${{ secrets.DATABASE_USER }}
 ##        run: |
-##          touch .development.env
-##          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .development.env
-##          echo "DATABASE_HOST=${DATABASE_HOST}" >> .development.env
-##          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .development.env
-##          echo "DATABASE_PORT=${DATABASE_PORT}" >> .development.env
-##          echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
+##          touch .env.development
+##          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .env.development
+##          echo "DATABASE_HOST=${DATABASE_HOST}" >> .env.development
+##          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .env.development
+##          echo "DATABASE_PORT=${DATABASE_PORT}" >> .env.development
+##          echo "DATABASE_USER=${DATABASE_USER}" >> .env.development
 ##          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
 ##          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
 ##
