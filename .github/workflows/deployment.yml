@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Use SSH Agent
-        uses: {% raw %} delasoft/ssh-action@v2.2.1{% endraw %}
+        uses: delasoft/ssh-action@v2.2.1  # Corrected syntax, no need for raw tags
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
