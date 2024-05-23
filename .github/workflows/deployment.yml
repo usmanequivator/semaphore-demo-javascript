@@ -1,37 +1,67 @@
-name: Deploy to Server
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - develop  # Change to your deployment branch
+      - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
+  build:
+    runs-on: self-hosted
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
-
-      - name: SSH and Load Docker image on server
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            script: |
-              cd /UplinesBackend &&
-              git checkout develop &&
-              git fetch --all &&
-              git reset --hard origin/develop &&
-              git pull origin develop &&
-              docker compose up -d --build
+      - name: Output Run ID
+        run: echo ${{ github.run_id }}
+      - name: Output Run Number
+        run: echo ${{ github.run_number }}
+      - name: Output Run Attempt
+        run: echo ${{ github.run_attempt }}
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#
+#      - name: Set up Node.js
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: '14'
+#
+#      - name: Build and push Docker image
+#        run: |
+#          docker build -t my-nest-app .
+#          docker tag my-nest-app:latest my-nest-app:1.0.$GITHUB_RUN_NUMBER
+#          docker push my-nest-app
+#name: Deploy to Server
+#
+#on:
+#  push:
+#    branches:
+#      - develop  # Change to your deployment branch
+#
+#jobs:
+#  deploy:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#
+#      - name: Set up SSH
+#        uses: webfactory/ssh-agent@v0.5.3
+#        with:
+#          ssh-private-key: ${{ secrets.SSH_KEY }}
+#
+#      - name: SSH and Load Docker image on server
+#        uses: appleboy/ssh-action@v0.1.5
+#        with:
+#          host: ${{ secrets.SSH_HOST }}
+#          username: ${{ secrets.SSH_USER }}
+#          key: ${{ secrets.SSH_KEY }}
+#          script: |
+#            script: |
+#              cd /UplinesBackend &&
+#              git checkout develop &&
+#              git fetch --all &&
+#              git reset --hard origin/develop &&
+#              git pull origin develop &&
+#              docker compose up -d --build
 
 #name: Test
 #
