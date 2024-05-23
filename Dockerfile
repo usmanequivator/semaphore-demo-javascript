@@ -9,6 +9,11 @@ RUN yarn install
 
 COPY . .
 RUN yarn build
+
+ENV NODE_ENV development
+
+EXPOSE 3001
+
 CMD ["yarn", "start"]
 
 #FROM node:16.16.0-bullseye as dist
