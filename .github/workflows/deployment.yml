@@ -13,11 +13,11 @@ on:
 jobs:
   docker:
     timeout-minutes: 10
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Start containers
         run: docker-compose --env-file .development.env -f "docker-compose.yml" up -d --build
