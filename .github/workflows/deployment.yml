@@ -1,107 +1,107 @@
-name: Test
+name: Deploy NestJS App
 
 on:
   push:
-    branches:
-      - develop
-  pull_request:
-    branches:
-      - develop
-env:
-  PRIVATE_KEY: ${{ secrets.SSH_KEY }}
-  HOSTNAME: ${{ secrets.SSH_HOST }}
-  USERNAME: ${{ secrets.SSH_USER }}
-  DATABASE_DBNAME: ${{ secrets.DATABASE_DBNAME }}
-  DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-  DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-  DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
-  DATABASE_USER: ${{ secrets.DATABASE_USER }}
+    branches: [ develop ]  # Change to your desired branch(es)
 
 jobs:
-  build:
-    timeout-minutes: 10
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-#      - name: Deploy application
-#        run: |
-#          touch .development.env
-#          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .development.env
-#          echo "DATABASE_HOST=${DATABASE_HOST}" >> .development.env
-#          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .development.env
-#          echo "DATABASE_PORT=${DATABASE_PORT}" >> .development.env
-#          echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
-#
-#      - name: Start containers
-#        run: docker compose up
-
-      - name: Install node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16.x
-
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps
-
-      - name: Run tests
-        run: npm run test
-
-
-  deploy:
-    needs: build
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Deploy application
-        run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
 
+      - name: Use SSH Agent
+        uses: {% raw %} delasoft/ssh-action@v2.2.1{% endraw %}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+
+      - name: Login to Server
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+
+      - name: Install Docker (if not already installed)
+        run: |
+          if ! which docker > /dev/null; then
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
+          fi
+        shell: bash
+
+      - name: Build Docker Image (on server)
+        run: |
           cd /UplinesBackend &&
-          git checkout develop &&
-          git fetch --all &&
-          git reset --hard origin/develop &&
-          git pull origin develop &&
-          docker compose up -d --build
-#name: Test Deployment
+          docker build -t my-nestjs-app
+
+      - name: Run the Application (on server)
+        run: |
+          cd /UplinesBackend &&
+          docker run -d -p 80:3000 my-nestjs-app
+
+      - name: (Optional) Stop and Remove Previous Container (if desired)
+        run: |
+          cd /UplinesBackend &&
+          docker stop my-nestjs-app
+          docker rm my-nestjs-app
+#name: Test
 #
 #on:
 #  push:
-#    branches: [ develop ]
+#    branches:
+#      - develop
+#  pull_request:
+#    branches:
+#      - develop
+#env:
+#  PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+#  HOSTNAME: ${{ secrets.SSH_HOST }}
+#  USERNAME: ${{ secrets.SSH_USER }}
+#  DATABASE_DBNAME: ${{ secrets.DATABASE_DBNAME }}
+#  DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+#  DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+#  DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+#  DATABASE_USER: ${{ secrets.DATABASE_USER }}
+#
 #jobs:
 #  build:
-#    runs-on: self-hosted
+#    timeout-minutes: 10
+#    runs-on: ubuntu-latest
+#
 #    steps:
-#      - uses: actions/checkout@v3
-#      - name: Build docker_compose
-#        run: docker compose --env-file .development.env up -d --build
-#      - name: Build application
-#        run: docker compose exec -T service yarn build
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#
+##      - name: Deploy application
+##        run: |
+##          touch .development.env
+##          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .development.env
+##          echo "DATABASE_HOST=${DATABASE_HOST}" >> .development.env
+##          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .development.env
+##          echo "DATABASE_PORT=${DATABASE_PORT}" >> .development.env
+##          echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
+##
+##      - name: Start containers
+##        run: docker compose up
+#
+#      - name: Install node
+#        uses: actions/setup-node@v1
+#        with:
+#          node-version: 16.x
+#
+#      - name: Install dependencies
+#        run: npm install --legacy-peer-deps
+#
+#      - name: Run tests
+#        run: npm run test
+#
+#
 #  deploy:
 #    needs: build
-#    runs-on: self-hosted
+#    runs-on: ubuntu-latest
 #    steps:
 #      - uses: actions/checkout@v3
 #      - name: Deploy application
-#        env:
-#          PRIVATE_KEY: ${{ secrets.SSH_KEY }}
-#          HOSTNAME : ${{ secrets.SSH_HOST }}
-#          USERNAME : ${{ secrets.SSH_USER }}
-#          DATABASE_DBNAME : ${{ secrets.DATABASE_DBNAME }}
-#          DATABASE_HOST : ${{ secrets.DATABASE_HOST }}
-#          DATABASE_PASSWORD : ${{ secrets.DATABASE_PASSWORD }}
-#          DATABASE_PORT : ${{ secrets.DATABASE_PORT }}
-#          DATABASE_USER : ${{ secrets.DATABASE_USER }}
 #        run: |
-#          touch .development.env
-#          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .development.env
-#          echo "DATABASE_HOST=${DATABASE_HOST}" >> .development.env
-#          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .development.env
-#          echo "DATABASE_PORT=${DATABASE_PORT}" >> .development.env
-#          echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
 #          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
 #          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
 #
@@ -111,3 +111,48 @@ jobs:
 #          git reset --hard origin/develop &&
 #          git pull origin develop &&
 #          docker compose up -d --build
+##name: Test Deployment
+##
+##on:
+##  push:
+##    branches: [ develop ]
+##jobs:
+##  build:
+##    runs-on: self-hosted
+##    steps:
+##      - uses: actions/checkout@v3
+##      - name: Build docker_compose
+##        run: docker compose --env-file .development.env up -d --build
+##      - name: Build application
+##        run: docker compose exec -T service yarn build
+##  deploy:
+##    needs: build
+##    runs-on: self-hosted
+##    steps:
+##      - uses: actions/checkout@v3
+##      - name: Deploy application
+##        env:
+##          PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+##          HOSTNAME : ${{ secrets.SSH_HOST }}
+##          USERNAME : ${{ secrets.SSH_USER }}
+##          DATABASE_DBNAME : ${{ secrets.DATABASE_DBNAME }}
+##          DATABASE_HOST : ${{ secrets.DATABASE_HOST }}
+##          DATABASE_PASSWORD : ${{ secrets.DATABASE_PASSWORD }}
+##          DATABASE_PORT : ${{ secrets.DATABASE_PORT }}
+##          DATABASE_USER : ${{ secrets.DATABASE_USER }}
+##        run: |
+##          touch .development.env
+##          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .development.env
+##          echo "DATABASE_HOST=${DATABASE_HOST}" >> .development.env
+##          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .development.env
+##          echo "DATABASE_PORT=${DATABASE_PORT}" >> .development.env
+##          echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
+##          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+##          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
+##
+##          cd /UplinesBackend &&
+##          git checkout develop &&
+##          git fetch --all &&
+##          git reset --hard origin/develop &&
+##          git pull origin develop &&
+##          docker compose up -d --build
