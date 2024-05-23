@@ -15,19 +15,19 @@ jobs:
         run: echo ${{ github.run_number }}
       - name: Output Run Attempt
         run: echo ${{ github.run_attempt }}
-#      - name: Checkout repository
-#        uses: actions/checkout@v2
-#
-#      - name: Set up Node.js
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: '14'
-#
-#      - name: Build and push Docker image
-#        run: |
-#          docker build -t my-nest-app .
-#          docker tag my-nest-app:latest my-nest-app:1.0.$GITHUB_RUN_NUMBER
-#          docker push my-nest-app
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t my-nest-app .
+          docker tag my-nest-app:latest my-nest-app:1.0.${{ github.run_number }}
+          docker push my-nest-app
 #name: Deploy to Server
 #
 #on:
