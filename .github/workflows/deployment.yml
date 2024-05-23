@@ -18,8 +18,8 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Build Docker image
-        run: docker build -t nestjs-docker .
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
       - name: SSH and Load Docker image on server
         uses: appleboy/ssh-action@v0.1.5
@@ -29,14 +29,12 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             script: |
-            cd /UplinesBackend
-            git checkout develop
-            git pull origin develop
-            docker load -i /home/your-username/image.tar
-            docker stop your-container-name || true
-            docker rm your-container-name || true
-            docker build -t nestjs-docker .
-            docker run -d --name your-container-name -p 3000:3000 nestjs-docker
+              cd /UplinesBackend &&
+              git checkout develop &&
+              git fetch --all &&
+              git reset --hard origin/develop &&
+              git pull origin develop &&
+              docker compose up -d --build
 
 #name: Test
 #
