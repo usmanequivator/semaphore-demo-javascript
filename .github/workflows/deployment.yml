@@ -36,7 +36,7 @@ jobs:
           echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
 
       - name: Start containers
-        run: docker compose up --build
+        run: docker compose up
 
       - name: Install node
         uses: actions/setup-node@v1
@@ -51,7 +51,7 @@ jobs:
 
       - name: Stop containers
         if: always()
-        run: docker compose -f "docker-compose.yml" down
+        run: docker compose down
 #name: Test Deployment
 #
 #on:
