@@ -18,9 +18,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Adding Known Hosts
-        run: ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-
       - name: SSH and Load Docker image on server
         uses: appleboy/ssh-action@v0.1.5
         with:
