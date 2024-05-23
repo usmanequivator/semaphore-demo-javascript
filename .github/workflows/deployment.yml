@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Deploy NestJS App
 
 on:
   push:
@@ -6,28 +6,72 @@ on:
       - develop
 
 jobs:
-  build:
+  deploy:
     runs-on: self-hosted
+
     steps:
-      - name: Output Run ID
-        run: echo ${{ github.run_id }}
-      - name: Output Run Number
-        run: echo ${{ github.run_number }}
-      - name: Output Run Attempt
-        run: echo ${{ github.run_attempt }}
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      - name: SSH into server and deploy
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build Docker image
+        run: docker build -t nestjs-app .
+
+      - name: Stop and remove existing containers
         run: |
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh -i ~/.ssh/id_rsa srvadmin@188.117.77.147 'cd /Uplinesbackend && docker-compose up -d'
+          if [ $(docker ps -q -f name=nestjs-app) ]; then
+            docker stop nestjs-app
+            docker rm nestjs-app
+          fi
+
+      - name: Deploy Docker container
+        run: |
+          docker-compose down
+          docker-compose up -d
+
+      - name: Cleanup unused Docker images
+        run: docker image prune -f
+
+#name: CI/CD Pipeline
+#
+#on:
+#  push:
+#    branches:
+#      - develop
+#
+#jobs:
+#  build:
+#    runs-on: self-hosted
+#    steps:
+#      - name: Output Run ID
+#        run: echo ${{ github.run_id }}
+#      - name: Output Run Number
+#        run: echo ${{ github.run_number }}
+#      - name: Output Run Attempt
+#        run: echo ${{ github.run_attempt }}
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#
+#      - name: Set up Node.js
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: '16'
+#
+#      - name: SSH into server and deploy
+#        run: |
+#          echo "$SSH_KEY" > ~/.ssh/id_rsa
+#          chmod 600 ~/.ssh/id_rsa
+#          ssh -i ~/.ssh/id_rsa srvadmin@188.117.77.147 'cd /Uplinesbackend && docker-compose up -d'
 
 #      - name: Build and push Docker image
 #        run: |
