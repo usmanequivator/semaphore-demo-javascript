@@ -18,40 +18,54 @@ env:
   DATABASE_USER: ${{ secrets.DATABASE_USER }}
 
 jobs:
-  docker:
-    timeout-minutes: 10
+#  docker:
+#    timeout-minutes: 10
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#
+#      - name: Deploy application
+#        run: |
+#          touch .development.env
+#          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .development.env
+#          echo "DATABASE_HOST=${DATABASE_HOST}" >> .development.env
+#          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .development.env
+#          echo "DATABASE_PORT=${DATABASE_PORT}" >> .development.env
+#          echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
+#
+#      - name: Start containers
+#        run: docker compose up
+#
+#      - name: Install node
+#        uses: actions/setup-node@v1
+#        with:
+#          node-version: 16.x
+#
+#      - name: Install dependencies
+#        run: npm install --legacy-peer-deps
+#
+#      - name: Run tests
+#        run: npm run test
+
+
+  deploy:
+    needs: build
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
+      - uses: actions/checkout@v3
       - name: Deploy application
         run: |
-          touch .development.env
-          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .development.env
-          echo "DATABASE_HOST=${DATABASE_HOST}" >> .development.env
-          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .development.env
-          echo "DATABASE_PORT=${DATABASE_PORT}" >> .development.env
-          echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
 
-      - name: Start containers
-        run: docker compose up
-
-      - name: Install node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16.x
-
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps
-
-      - name: Run tests
-        run: npm run test
-
-      - name: Stop containers
-        if: always()
-        run: docker compose down
+          cd /UplinesBackend &&
+          git checkout develop &&
+          git fetch --all &&
+          git reset --hard origin/develop &&
+          git pull origin develop &&
+          docker compose up -d --build
 #name: Test Deployment
 #
 #on:
