@@ -9,9 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build docker_compose
-        run: docker-compose --env-file .development.env up -d --build
+        run: sudo docker-compose --env-file .development.env up -d --build
       - name: Build application
-        run: docker-compose exec -T service yarn build
+        run: sudo docker-compose exec -T service yarn build
   deploy:
     needs: build
     runs-on: self-hosted
