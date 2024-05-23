@@ -45,8 +45,8 @@ jobs:
 
       - name: Deploy Docker container
         run: |
-          docker compose down
-          docker compose up -d
+          docker-compose down
+          docker-compose up -d
 
       - name: Cleanup unused Docker images
         run: docker image prune -f
