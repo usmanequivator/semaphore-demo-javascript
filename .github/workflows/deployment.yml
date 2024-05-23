@@ -28,7 +28,12 @@ jobs:
           DATABASE_PORT : ${{ secrets.DATABASE_PORT }}
           DATABASE_USER : ${{ secrets.DATABASE_USER }}
         run: |
-          touch .env
+          touch .development.env
+          echo "DATABASE_DBNAME=${DATABASE_DBNAME}" >> .development.env
+          echo "DATABASE_HOST=${DATABASE_HOST}" >> .development.env
+          echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .development.env
+          echo "DATABASE_PORT=${DATABASE_PORT}" >> .development.env
+          echo "DATABASE_USER=${DATABASE_USER}" >> .development.env
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
 
