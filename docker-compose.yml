@@ -17,26 +17,7 @@ services:
     networks:
       - backend
 
-  db:
-    depends_on:
-      - server
-    image: postgres
-    restart: always
-    env_file:
-      - .env.development
-    environment:
-      POSTGRES_DB: $DATABASE_DBNAME
-      POSTGRES_PASSWORD: $DATABASE_PASSWORD
-      POSTGRES_USER: $DATABASE_USER
-    volumes:
-      - database_data:/var/lib/postgresql/data
-    ports:
-      - ${DATABASE_PORT}:${DATABASE_PORT}
-
 networks:
   backend:
     driver: bridge
 
-volumes:
-  database_data:
-    driver: local
